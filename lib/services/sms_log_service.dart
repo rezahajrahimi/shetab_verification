@@ -1,13 +1,13 @@
 import 'dart:convert';
-import 'package:shared_preferences.dart';
 import '../models/sms_log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SmsLogService {
   static const String _key = 'sms_logs';
   static const int _pageSize = 20;
 
   Future<void> addLog(SmsLog log) async {
-    final prefs = await SharedPreferences.getInstance();
+     await SharedPreferences.getInstance();
     final logs = await getLogs();
     logs.insert(0, log);
     await _saveLogs(logs);

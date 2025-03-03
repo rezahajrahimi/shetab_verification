@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../models/sms_log.dart';
 import '../services/sms_log_service.dart';
 
@@ -11,29 +12,37 @@ class SmsLogsScreen extends StatefulWidget {
 
 class _SmsLogsScreenState extends State<SmsLogsScreen> {
   final SmsLogService _logService = SmsLogService();
-  List<SmsLog> _logs = [];
-  int _currentPage = 1;
-  bool _hasMore = true;
-  bool _isLoading = false;
+  static const _pageSize = 20;
+
+  final PagingController<int, SmsLog> _pagingController =
+      PagingController(firstPageKey: 1);
 
   @override
   void initState() {
+    _pagingController.addPageRequestListener((pageKey) {
+      _fetchPage(pageKey);
+    });
     super.initState();
-    _loadLogs();
   }
 
-  Future<void> _loadLogs() async {
-    if (_isLoading || !_hasMore) return;
-    
-    setState(() => _isLoading = true);
-    final newLogs = await _logService.getLogs(page: _currentPage);
-    
-    setState(() {
-      _logs.addAll(newLogs);
-      _hasMore = newLogs.length == 20;
-      _currentPage++;
-      _isLoading = false;
-    });
+  Future<void> _fetchPage(int pageKey) async {
+    try {
+      final newItems = await _logService.getLogs(page: pageKey);
+      final isLastPage = newItems.length < _pageSize;
+      if (isLastPage) {
+        _pagingController.appendLastPage(newItems);
+      } else {
+        _pagingController.appendPage(newItems, pageKey + 1);
+      }
+    } catch (error) {
+      _pagingController.error = error;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,28 +52,11 @@ class _SmsLogsScreenState extends State<SmsLogsScreen> {
         title: const Text('تاریخچه ارسال پیامک‌ها'),
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            _logs = [];
-            _currentPage = 1;
-            _hasMore = true;
-          });
-          await _loadLogs();
-        },
-        child: ListView.builder(
-          itemCount: _logs.length + (_hasMore ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index == _logs.length) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            final log = _logs[index];
-            return Card(
+        onRefresh: () => Future.sync(() => _pagingController.refresh()),
+        child: PagedListView<int, SmsLog>(
+          pagingController: _pagingController,
+          builderDelegate: PagedChildBuilderDelegate<SmsLog>(
+            itemBuilder: (context, log, index) => Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(
                 title: Text(log.from),
@@ -74,6 +66,10 @@ class _SmsLogsScreenState extends State<SmsLogsScreen> {
                     Text('مبلغ: ${log.amount}'),
                     Text('شناسه تراکنش: ${log.recipeId}'),
                     Text('تاریخ: ${_formatDate(log.date)}'),
+                    if (log.error != null)
+                      Text('خطا: ${log.error}', 
+                        style: const TextStyle(color: Colors.red),
+                      ),
                   ],
                 ),
                 trailing: Icon(
@@ -81,9 +77,20 @@ class _SmsLogsScreenState extends State<SmsLogsScreen> {
                   color: log.success ? Colors.green : Colors.red,
                 ),
               ),
-            );
-          },
-          onEndReached: _loadLogs,
+            ),
+            firstPageProgressIndicatorBuilder: (_) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            newPageProgressIndicatorBuilder: (_) => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            noItemsFoundIndicatorBuilder: (_) => const Center(
+              child: Text('هیچ لاگی یافت نشد'),
+            ),
+          ),
         ),
       ),
     );
