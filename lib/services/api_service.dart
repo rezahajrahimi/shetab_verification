@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import '../models/api_settings.dart';
 
 class ApiService {
@@ -49,10 +50,10 @@ class ApiService {
         );
       }
     } on DioException catch (e) {
-      print('خطا در ارسال به API: ${e.message}');
+      EasyLoading.showError("خطا در ارسال به API: ${e.message}");
       if (e.response != null) {
-        print('کد خطا: ${e.response?.statusCode}');
-        print('پاسخ سرور: ${e.response?.data}');
+        EasyLoading.showError("کد خطا: ${e.response?.statusCode}");
+        EasyLoading.showError("پاسخ سرور: ${e.response?.data}");
       }
       rethrow;
     }
