@@ -10,7 +10,7 @@ class ApiService {
       baseUrl: settings.endpoint,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${settings.apiKey}',
+        'Authorization': settings.apiKey,
       },
     ));
 
@@ -27,6 +27,8 @@ class ApiService {
     required String message,
     required int? date,
     required String description,
+    required String amount,
+    required String recipeId,
   }) async {
     try {
       final response = await _dio.post(
