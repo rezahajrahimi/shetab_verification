@@ -27,6 +27,8 @@ class ApiService {
     required String message,
     required int? date,
     required String description,
+    required String amount,
+    required String recipeId,
   }) async {
     try {
       final response = await _dio.post(
