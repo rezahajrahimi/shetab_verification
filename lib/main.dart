@@ -1,5 +1,6 @@
 import 'package:another_telephony/telephony.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
 import 'screens/phone_numbers_screen.dart';
@@ -17,27 +18,27 @@ void callbackDispatcher() {
     final phoneNumberService = PhoneNumberService();
     final apiSettingsService = ApiSettingsService();
     final smsParser = SmsParserService();
-    
+
     final phoneNumbers = await phoneNumberService.getPhoneNumbers();
     final apiSettings = await apiSettingsService.getApiSettings();
-    
+
     if (apiSettings.endpoint.isEmpty || apiSettings.apiKey.isEmpty) {
-      print("تنظیمات API صحیح نیست");
+      EasyLoading.showError("لطفا تنظیمات API را چک بفرمایید");
       return Future.value(true);
     }
 
     final apiService = ApiService(apiSettings);
-    
+
     for (var phoneNumber in phoneNumbers) {
       List<SmsMessage> messages = await telephony.getInboxSms(
         columns: [SmsColumn.ADDRESS, SmsColumn.BODY, SmsColumn.DATE],
         filter: SmsFilter.where(SmsColumn.ADDRESS).equals(phoneNumber.number),
       );
-      
+
       for (var message in messages) {
         try {
           final parsedData = smsParser.parseMessage(message.body ?? '');
-          
+
           await apiService.sendSmsData(
             from: message.address ?? '',
             message: message.body ?? '',
@@ -47,7 +48,7 @@ void callbackDispatcher() {
             recipeId: parsedData['recipeId'] ?? '',
           );
         } catch (e) {
-          print("خطا در ارسال پیامک به API: $e");
+          EasyLoading.showError("خطا در ارسال پیامک به API: $e");
         }
       }
     }
@@ -57,11 +58,11 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // راه‌اندازی سرشماره‌های پیش‌فرض
   final phoneNumberService = PhoneNumberService();
   await phoneNumberService.initializeDefaultPhoneNumbers();
-  
+
   await Workmanager().initialize(callbackDispatcher);
   await Workmanager().registerPeriodicTask(
     "sms-reader",
@@ -83,13 +84,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
       home: const MyHomePage(title: 'Shetab Verification'),
+      builder: EasyLoading.init(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
 
   final String title;
 
@@ -133,7 +134,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PhoneNumbersScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const PhoneNumbersScreen()),
                 );
               },
               child: const Text('مدیریت سرشماره‌ها'),
@@ -143,7 +145,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ApiSettingsScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const ApiSettingsScreen()),
                 );
               },
               child: const Text('تنظیمات API'),
