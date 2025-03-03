@@ -57,6 +57,11 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // راه‌اندازی سرشماره‌های پیش‌فرض
+  final phoneNumberService = PhoneNumberService();
+  await phoneNumberService.initializeDefaultPhoneNumbers();
+  
   await Workmanager().initialize(callbackDispatcher);
   await Workmanager().registerPeriodicTask(
     "sms-reader",

@@ -41,7 +41,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
       apiKey: _apiKeyController.text,
     );
     await _service.saveApiSettings(settings);
-    if (!context.mounted) return;
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تنظیمات با موفقیت ذخیره شد')),
     );

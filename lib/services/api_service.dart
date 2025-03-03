@@ -10,7 +10,7 @@ class ApiService {
       baseUrl: settings.endpoint,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${settings.apiKey}',
+        'Authorization': settings.apiKey,
       },
     ));
 

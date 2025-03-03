@@ -5,10 +5,39 @@ import '../models/phone_number.dart';
 class PhoneNumberService {
   static const String _key = 'phone_numbers';
   
+  // لیست سرشماره‌های پیش‌فرض
+  static final List<PhoneNumber> _defaultPhoneNumbers = [
+    PhoneNumber(
+      number: 'B.Pasargard',
+      description: 'بانک پاسارگاد',
+    ),
+    PhoneNumber(
+      number: 'Bank Mellat',
+      description: 'بانک ملت',
+    ),
+    PhoneNumber(
+      number: '+98999987641',
+      description: 'بلو بانک',
+    ),
+  ];
+
+  // متد جدید برای بررسی و اضافه کردن سرشماره‌های پیش‌فرض
+  Future<void> initializeDefaultPhoneNumbers() async {
+    final existingNumbers = await getPhoneNumbers();
+    
+    if (existingNumbers.isEmpty) {
+      await savePhoneNumbers(_defaultPhoneNumbers);
+    }
+  }
+
   Future<List<PhoneNumber>> getPhoneNumbers() async {
     final prefs = await SharedPreferences.getInstance();
     final String? jsonString = prefs.getString(_key);
-    if (jsonString == null) return [];
+    if (jsonString == null) {
+      // اگر هیچ سرشماره‌ای وجود نداشت، سرشماره‌های پیش‌فرض را اضافه کن
+      await initializeDefaultPhoneNumbers();
+      return _defaultPhoneNumbers;
+    }
     
     final List<dynamic> jsonList = json.decode(jsonString);
     return jsonList.map((json) => PhoneNumber.fromJson(json)).toList();
