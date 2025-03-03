@@ -5,10 +5,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
 import 'screens/phone_numbers_screen.dart';
 import 'screens/api_settings_screen.dart';
+import 'screens/sms_logs_screen.dart';
 import 'services/phone_number_service.dart';
 import 'services/api_settings_service.dart';
 import 'services/api_service.dart';
 import 'services/sms_parser_service.dart';
+import 'services/sms_log_service.dart';
+import 'models/sms_log.dart';
 
 // Background task handler
 @pragma('vm:entry-point')
@@ -47,7 +50,28 @@ void callbackDispatcher() {
             amount: parsedData['amount'] ?? '',
             recipeId: parsedData['recipeId'] ?? '',
           );
+          
+          // اضافه کردن لاگ موفق
+          await SmsLogService().addLog(SmsLog(
+            from: message.address ?? '',
+            message: message.body ?? '',
+            date: DateTime.fromMillisecondsSinceEpoch(message.date ?? 0),
+            description: phoneNumber.description,
+            amount: parsedData['amount'] ?? '',
+            recipeId: parsedData['recipeId'] ?? '',
+          ));
         } catch (e) {
+          // اضافه کردن لاگ خطا
+          await SmsLogService().addLog(SmsLog(
+            from: message.address ?? '',
+            message: message.body ?? '',
+            date: DateTime.fromMillisecondsSinceEpoch(message.date ?? 0),
+            description: phoneNumber.description,
+            amount: '', // در صورت خطا، مقدار خالی قرار می‌دهیم
+            recipeId: '', // در صورت خطا، مقدار خالی قرار می‌دهیم
+            success: false,
+            error: e.toString(),
+          ));
           EasyLoading.showError("خطا در ارسال پیامک به API: $e");
         }
       }
@@ -150,6 +174,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('تنظیمات API'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SmsLogsScreen()),
+                );
+              },
+              child: const Text('تاریخچه ارسال پیامک‌ها'),
             ),
           ],
         ),
