@@ -113,9 +113,37 @@ Future<void> processSmsMessage(SmsMessage message) async {
   final phoneNumbers = await phoneNumberService.getPhoneNumbers();
   final apiSettings = await apiSettingsService.getApiSettings();
 
+  // نرمال‌سازی شماره پیامک
+  String normalizedAddress = (message.address ?? '')
+    .trim()
+    .toLowerCase()
+    .replaceAll(" ", "")
+    .replaceAll("+98", "")
+    .replaceAll("98", "");
+  
+  if (normalizedAddress.startsWith("0")) {
+    normalizedAddress = normalizedAddress.substring(1);
+  }
+  
+  debugPrint("شماره نرمال شده: $normalizedAddress");
+
   // بررسی اینکه آیا پیامک از شماره‌های مورد نظر است
-  final matchingNumber = phoneNumbers.where((number) => 
-    message.address?.contains(number.number) ?? false).firstOrNull;
+  final matchingNumber = phoneNumbers.where((number) {
+    String normalizedNumber = number.number
+      .trim()
+      .toLowerCase()
+      .replaceAll(" ", "")
+      .replaceAll("+98", "")
+      .replaceAll("98", "");
+    
+    if (normalizedNumber.startsWith("0")) {
+      normalizedNumber = normalizedNumber.substring(1);
+    }
+    
+    debugPrint("مقایسه: $normalizedAddress با $normalizedNumber");
+    return normalizedAddress.contains(normalizedNumber) || 
+           normalizedNumber.contains(normalizedAddress);
+  }).firstOrNull;
 
   if (matchingNumber == null) {
     debugPrint("پیامک از شماره‌های تعریف شده نیست");
