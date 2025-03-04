@@ -22,20 +22,20 @@ class PhoneNumberService {
   ];
 
   // متد جدید برای بررسی و اضافه کردن سرشماره‌های پیش‌فرض
-  Future<void> initializeDefaultPhoneNumbers() async {
-    final existingNumbers = await getPhoneNumbers();
+  // Future<void> initializeDefaultPhoneNumbers() async {
+  //   final existingNumbers = await getPhoneNumbers();
     
-    if (existingNumbers.isEmpty) {
-      await savePhoneNumbers(_defaultPhoneNumbers);
-    }
-  }
+  //   if (existingNumbers.isEmpty) {
+  //     await savePhoneNumbers(_defaultPhoneNumbers);
+  //   }
+  // }
 
   Future<List<PhoneNumber>> getPhoneNumbers() async {
     final prefs = await SharedPreferences.getInstance();
     final String? jsonString = prefs.getString(_key);
     if (jsonString == null) {
       // اگر هیچ سرشماره‌ای وجود نداشت، سرشماره‌های پیش‌فرض را اضافه کن
-      await initializeDefaultPhoneNumbers();
+      // await initializeDefaultPhoneNumbers();
       return _defaultPhoneNumbers;
     }
     
