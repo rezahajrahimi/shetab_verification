@@ -2,6 +2,10 @@
 
 این پروژه یک سیستم تایید خودکار کارت به کارت در شبکه شتاب است که با استفاده از **فلاتر (Flutter)** توسعه داده شده است. این سیستم با تحلیل پیامک‌های دریافتی از سرشماره‌های بانکی، اطلاعات واریز به حساب را استخراج کرده و به `endpoint` تعریف‌شده در برنامه ارسال می‌کند.
 
+## دانلود نسخه‌ها
+
+- [دانلود نسخه ساین نشده (app-release-unsigned.apk)](release/app-release-unsigned.apk)
+
 ## ویژگی‌های پروژه
 
 - **تایید خودکار تراکنش‌ها**: با تحلیل پیامک‌های بانکی، اطلاعات واریز به صورت خودکار استخراج و تایید می‌شود.
@@ -41,6 +45,11 @@
 # Card-to-Card Gateway (Automatic Verification in Shetab Network)
 
 This project is an automatic card-to-card verification system in the Shetab network, developed using **Flutter**. The system analyzes incoming SMS messages from bank-specific numbers, extracts deposit information, and sends it to a predefined `endpoint` in the application.
+
+# Download
+
+- [UnSigned (app-release-unsigned.apk)](release/app-release-unsigned.apk)
+
 
 ## Project Features
 
