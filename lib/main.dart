@@ -43,6 +43,9 @@ void callbackDispatcher() {
         filter: SmsFilter.where(SmsColumn.ADDRESS).equals(phoneNumber.number),
       );
       debugPrint("messages: $messages");
+      // remove old messages with 10 minutes ago 
+      messages = messages.where((message) => message.date! > DateTime.now().subtract(Duration(minutes: 10)).millisecondsSinceEpoch).toList();
+      debugPrint("messages after removing old messages: $messages");
 
       for (var message in messages) {
         debugPrint("message: $message");
