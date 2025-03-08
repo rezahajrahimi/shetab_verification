@@ -39,6 +39,8 @@ class ApiService {
           'message': message,
           'date': date,
           'description': description,
+          'amount': amount,
+          'recipeId': recipeId,
         },
       );
 
