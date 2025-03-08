@@ -292,51 +292,193 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        elevation: 2,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('برنامه در حال مانیتور کردن پیامک‌ها است'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _requestPermissions,
-              child: const Text('درخواست مجوز پیامک'),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.inversePrimary.withValues(alpha: 0.1),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // وضعیت سرویس
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.message_outlined,
+                            color: Colors.green,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'سرویس پیامک فعال است',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'در حال مانیتور کردن پیامک‌های ورودی',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // دکمه‌های عملیات
+                const Text(
+                  'تنظیمات و مدیریت',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  children: [
+                    _buildMenuCard(
+                      context,
+                      icon: Icons.perm_device_information,
+                      title: 'مجوزهای برنامه',
+                      subtitle: 'درخواست و بررسی دسترسی‌ها',
+                      color: Colors.blue,
+                      onTap: _requestPermissions,
+                    ),
+                    _buildMenuCard(
+                      context,
+                      icon: Icons.phone_android,
+                      title: 'سرشماره‌ها',
+                      subtitle: 'مدیریت شماره‌های بانکی',
+                      color: Colors.orange,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhoneNumbersScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuCard(
+                      context,
+                      icon: Icons.settings,
+                      title: 'تنظیمات API',
+                      subtitle: 'پیکربندی ارتباط با سرور',
+                      color: Colors.purple,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ApiSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuCard(
+                      context,
+                      icon: Icons.history,
+                      title: 'تاریخچه',
+                      subtitle: 'گزارش پیامک‌های دریافتی',
+                      color: Colors.teal,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SmsLogsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PhoneNumbersScreen()),
-                );
-              },
-              child: const Text('مدیریت سرشماره‌ها'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ApiSettingsScreen()),
-                );
-              },
-              child: const Text('تنظیمات API'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SmsLogsScreen()),
-                );
-              },
-              child: const Text('تاریخچه ارسال پیامک‌ها'),
-            ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
