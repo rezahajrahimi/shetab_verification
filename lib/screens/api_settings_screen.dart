@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shetab_verification/screens/qr_scanner_screen.dart';
 import '../models/api_settings.dart';
 import '../services/api_settings_service.dart';
 
@@ -13,7 +14,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
   final ApiSettingsService _service = ApiSettingsService();
   final _endpointController = TextEditingController();
   final _apiKeyController = TextEditingController();
-  
+  bool _isSecureText = true;
   @override
   void initState() {
     super.initState();
@@ -47,6 +48,29 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
     );
   }
   
+  Future<void> _handleQrScan({required String type}) async {
+    try {
+      final qrData = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const QrScannerScreen(),
+        ),
+      );
+      
+      if (qrData != null && mounted) {
+        setState(() {
+          if (type == 'endpoint') {
+            _endpointController.text = qrData;
+          } else if (type == 'apiKey') {
+            _apiKeyController.text = qrData;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('خطا در اسکن QR: $e');
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,32 +82,65 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _endpointController,
-              decoration: const InputDecoration(
-                labelText: 'آدرس API',
-                hintText: 'مثال: https://api.example.com/sms',
-              ),
-              textDirection: TextDirection.ltr,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _endpointController,
+                    decoration: const InputDecoration(
+                      labelText: 'آدرس API',
+                      hintText: 'مثال: https://api.example.com/sms',
+                    ),
+                    textDirection: TextDirection.ltr,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _handleQrScan(type: 'endpoint'),
+                  icon: const Icon(Icons.qr_code_scanner),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: _apiKeyController,
-              decoration: const InputDecoration(
-                labelText: 'کلید API',
-                hintText: 'کلید API خود را وارد کنید',
-              ),
-              textDirection: TextDirection.ltr,
-              obscureText: true,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _apiKeyController,
+                    obscuringCharacter: '*',
+                    // add show secure and unsecure icon
+                    decoration: InputDecoration(
+                      labelText: 'کلید API',
+                      hintText: 'کلید API خود را وارد کنید',
+                      suffixIcon: IconButton( 
+                        onPressed: () => _toggleSecureText(),
+                        icon: _isSecureText ?  Icon(Icons.visibility) :  Icon(Icons.visibility_off),
+                      ),
+                    ),
+                    textDirection: TextDirection.ltr,
+                    obscureText: _isSecureText,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _handleQrScan(type: 'apiKey'),
+                  icon: const Icon(Icons.qr_code_scanner),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: _saveSettings,
               child: const Text('ذخیره تنظیمات'),
             ),
+
           ],
         ),
       ),
     );
+  }
+  
+   _toggleSecureText() {
+    setState(() {
+      _isSecureText = !_isSecureText;
+    });
   }
 } 
