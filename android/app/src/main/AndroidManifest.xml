@@ -7,9 +7,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:label="shetab_verification"
+        android:label="Shetab Verification"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         

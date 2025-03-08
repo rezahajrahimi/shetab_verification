@@ -21,6 +21,9 @@ class SmsLogService {
     final List<dynamic> decoded = jsonDecode(logsJson);
     final List<SmsLog> logs = decoded.map((item) => SmsLog.fromMap(item)).toList();
     
+    // مرتب‌سازی بر اساس تاریخ از جدید به قدیم
+    logs.sort((a, b) => b.date.compareTo(a.date));
+    
     final startIndex = (page - 1) * _pageSize;
     final endIndex = startIndex + _pageSize;
     return logs.sublist(startIndex, endIndex.clamp(0, logs.length));
