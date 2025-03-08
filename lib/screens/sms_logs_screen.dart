@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../models/sms_log.dart';
 import '../services/sms_log_service.dart';
-
+import 'package:jalali_table_calendar/jalali_table_calendar.dart';
 class SmsLogsScreen extends StatefulWidget {
   const SmsLogsScreen({super.key});
 
@@ -97,6 +97,9 @@ class _SmsLogsScreenState extends State<SmsLogsScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}';
+    // زمان هجری شمسی
+    PersianDate pDate = PersianDate(date.toString());
+
+    return '${pDate.year}/${pDate.month}/${pDate.day} ${pDate.hour}:${pDate.minute}';
   }
 } 
