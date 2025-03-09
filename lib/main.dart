@@ -1,6 +1,5 @@
 import 'package:another_telephony/telephony.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart' as wm;
 import 'screens/phone_numbers_screen.dart';
@@ -30,7 +29,7 @@ void callbackDispatcher() {
     debugPrint("apiSettings: $apiSettings");
 
     if (apiSettings.endpoint.isEmpty || apiSettings.apiKey.isEmpty) {
-      EasyLoading.showError("لطفا تنظیمات API را چک بفرمایید");
+      debugPrint("apiSettings is empty");
       return Future.value(true);
     }
 
@@ -85,7 +84,7 @@ void callbackDispatcher() {
             success: false,
             error: e.toString(),
           ));
-          EasyLoading.showError("خطا در ارسال پیامک به API: $e");
+          debugPrint("error: $e");
         }
       }
     }
@@ -217,7 +216,7 @@ void main() async {
   final hasPermissions = await checkPermissions();
   if (!hasPermissions) {
     debugPrint("لطفا مجوزهای لازم را به برنامه بدهید");
-    EasyLoading.showError("لطفا مجوزهای لازم را به برنامه بدهید");
+    
   }
 
   // تنظیم گیرنده پیامک
@@ -258,7 +257,6 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
       home: const MyHomePage(title: 'Shetab Verification'),
-      builder: EasyLoading.init(),
     );
   }
 }
