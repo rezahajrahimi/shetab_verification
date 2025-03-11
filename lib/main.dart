@@ -95,11 +95,13 @@ void callbackDispatcher() {
 Future<bool> checkPermissions() async {
   final smsStatus = await Permission.sms.status;
   final phoneStatus = await Permission.phone.status;
+  final notificationStatus = await Permission.notification.status;
   
   if (!smsStatus.isGranted || !phoneStatus.isGranted) {
     debugPrint("مجوزهای لازم داده نشده است");
     debugPrint("وضعیت مجوز پیامک: $smsStatus");
     debugPrint("وضعیت مجوز تلفن: $phoneStatus");
+    debugPrint("وضعیت مجوز اعلان: $notificationStatus");
     return false;
   }
   return true;
@@ -212,6 +214,7 @@ void main() async {
   // درخواست و بررسی مجوزها
   await Permission.sms.request();
   await Permission.phone.request();
+  await Permission.notification.request(); // اضافه کردن درخواست مجوز اعلان برای اندروید 13+
   
   final hasPermissions = await checkPermissions();
   if (!hasPermissions) {
@@ -282,6 +285,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _requestPermissions() async {
     await Permission.sms.request();
+    await Permission.phone.request();
+    await Permission.notification.request(); // اضافه کردن درخواست مجوز اعلان
   }
 
   @override
